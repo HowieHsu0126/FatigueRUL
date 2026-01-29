@@ -14,15 +14,19 @@ venv/
 .venv/
 env/
 
-# Data and outputs
+# Data and outputs (keep .keep for directory structure)
 *.pkl
 *.npz
 *.mat
 *.log
 *.pth
-Output/
-Input/processed/
-Input/graph_processed/
+Output/**
+!Output/.keep
+!Output/*/.keep
+Input/processed/**
+!Input/processed/.keep
+Input/graph_processed/**
+!Input/graph_processed/.keep
 
 # Config backups
 *.backup

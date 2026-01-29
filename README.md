@@ -178,6 +178,19 @@ RUN_LSTM=1 python3 run_perf_compare.py
 └── README.md                  # 本说明
 ```
 
+各目录下 `.keep` 文件仅用于在版本控制中保留空目录结构，可忽略。
+
+### Input / Output 各文件夹应包含的文件
+
+| 目录 | 应包含的文件 | 说明 |
+|------|----------------|------|
+| **Input/raw/** | `data.mat`（或配置中指定的其它 .mat 文件名） | 试验原始数据：传感器时序（力、位移、时间等），由 `Libs/config/dataset.yaml` 的 `data_paths.raw_data` 指定路径。 |
+| **Input/processed/** | `training_dataset.csv`、`physics_results.pkl`、`sequences.npz`、`metadata.pkl`、`processed_metadata.json` 等 | 执行「准备数据集」后生成：带 RUL 标签的训练表、弹性模量等物理结果、滑窗序列与元数据；具体文件名以 `dataset.yaml` 的 `data_paths` 为准。 |
+| **Input/graph_processed/** | `graph_data.pt`、`graph_metadata.json` | 执行「准备图数据」后生成：图结构样本与元信息，供 GNN 训练使用。 |
+| **Output/logs/** | `experiment.log`；若用 SLURM 提交则有 `train_<jobid>.out`、`train_<jobid>.err` | 程序运行日志与任务标准输出/错误输出。 |
+| **Output/models/** | `best_xxx_model.pth`（如 `best_lstm_model.pth`、`best_gnn_model.pth`）、`best_model.pth` | 训练完成后保存的模型权重；具体名称由 `model.yaml` 的 `model_paths` 及训练脚本决定。 |
+| **Output/results/** | `all_dl_models_results.json`、`lstm_metrics.json`、`gru_metrics.json` 等 `*_metrics.json` | 各模型在验证/测试集上的评估指标（RMSE、MAE、R² 等），JSON 格式。 |
+
 ---
 
 ## 八、名词解释（方便阅读文档与结果）
