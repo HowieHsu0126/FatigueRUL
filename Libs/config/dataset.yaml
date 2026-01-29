@@ -1,0 +1,223 @@
+# Time Series Dataset Configuration File
+# Manages time series data preprocessing parameters
+
+# Data paths configuration
+data_paths:
+  # Input data path
+  raw_data: "Input/raw/data.mat"
+  
+  # Processed data paths
+  processed_data_dir: "Input/processed"
+  processed_sequences: "Input/processed/sequences.npz"
+  processed_metadata: "Input/processed/metadata.pkl"
+  processed_training_data: "Input/processed/training_dataset.csv"
+  physics_results: "Input/processed/physics_results.pkl"
+  graph_processed_dir: "Input/graph_processed"
+  graph_data_file: "Input/graph_processed/graph_data.pt"
+  graph_metadata: "Input/graph_processed/graph_metadata.json"
+
+# Graph dataset parameters
+graph_dataset:
+  graph_type: "stress_propagation"
+  device: "cpu"
+  
+  # Output paths
+  output_dir: "Output"
+  logs_dir: "Output/logs"
+
+# Time series data preprocessing parameters
+preprocessing:
+  # Data cleaning parameters
+  data_cleaning:
+    remove_inf: true
+    remove_nan: true
+    remove_outliers: true
+    outlier_method: "iqr"  # iqr, zscore
+    iqr_factor: 1.5
+    zscore_threshold: 3.0
+  
+  # Data splitting parameters
+  data_split:
+    test_size: 0.2
+    validation_size: 0.2  # Split from training set
+    random_state: 42
+    stratify: false  # Whether to use stratified sampling
+    split_method: "temporal"  # "temporal" for time-series split, "random" for random split
+    ensure_pre_failure_in_train: true  # Ensure training set contains pre-failure data
+    oversample_pre_failure_times: 3  # 0/1=no oversample; 2=2x, 3=3x for RUL>0 in train
+    train_pre_only: false  # when true, filter train to RUL>0 only
+    min_pre_failure_in_test: 2  # Minimum pre-failure samples in test set for stable R² (RUL>0)
+
+  # Time series specific parameters
+  time_series:
+    sequence_length: 1000  # Length of each sequence
+    stride: 500  # Sliding window stride
+    use_full_sequence: false  # Whether to use full sequences without sliding window
+    
+  # Normalization parameters
+  normalization:
+    method: "per_channel_minmax"  # per_channel_minmax, per_channel_standard
+    feature_range: [0, 1]  # For minmax normalization
+    
+  # Fatigue life calculation parameters
+  fatigue_life:
+    sigma_f_prime: 1000.0  # Fatigue strength coefficient (MPa)
+    b: -0.1  # Fatigue exponent
+    min_life: 1  # Minimum fatigue life
+    max_life: 1000000  # Maximum fatigue life
+    failure_threshold: 0.5  # Fraction of initial modulus that defines failure (0.0-1.0)
+    initial_periods: 20  # Number of initial periods to use for computing E_initial
+    min_valid_initial_points: 12  # Minimum valid points for stable initial modulus
+    initial_statistic: "trimmed_mean"  # trimmed_mean or median
+    trim_fraction: 0.1  # Trim fraction for trimmed mean
+    min_failure_cycle_ratio: 0.35  # Failure point should not occur before this ratio of total cycles
+    enable_adaptive_threshold: false  # Use stable threshold, no fallback widening
+    smoothing_window: 5  # Window size for smoothing elastic modulus before failure search
+    consecutive_below_threshold: 3  # Minimum consecutive cycles below threshold to confirm failure
+    search_start_ratio: 0.35  # Start scanning for failure after this fraction of valid cycles
+    loading_cycles_offset: 200  # Offset for short-experiment loading cycle formula (ref.m)
+    loading_cycles_per_step: 3000  # Loading cycles per time stage for short experiments
+    rul_transform: null  # 'log1p' for log(1+RUL) to compress scale; null = no transform
+
+  # Sensor data quality check parameters
+  quality_check:
+    enable: true
+    force_max_threshold: 500000.0  # Maximum acceptable force value in Newtons
+    displacement_max_threshold: 1e15  # Maximum acceptable displacement value in millimeters
+    jump_ratio_threshold: 10.0  # Threshold for detecting sudden jumps (ratio of change)
+    stability_window_ratio: 0.3  # Ratio of data length to use for front/back stability analysis
+    stability_variance_ratio_threshold: 10.0  # Threshold for variance ratio (back/front) to detect instability
+
+# Data channel configuration
+channels:
+  # Time channels
+  time_channels:
+    - "Zeit__1_-_Standardmessrate"
+    - "Zeit__2_-_Standardmessrate" 
+    - "Zeit__3_-_Standardmessrate"
+  
+  # Force sensor channels
+  force_channels:
+    - "Kraft_1"
+    - "Kraft_3"
+    - "Kraft_4"
+    - "Kraft_5"
+    - "Kraft_6"
+    - "Kraft_7"
+    - "Kraft_8"
+    - "Kraft_9"
+    - "Kraft_10"
+    - "Kraft_11"
+  
+  # Displacement sensor channels
+  displacement_channels:
+    - "Weg_1"
+    - "Weg_3"
+    - "Weg_4"
+    - "Weg_5"
+    - "Weg_6"
+    - "Weg_7"
+    - "Weg_8"
+    - "Weg_9"
+    - "Weg_10"
+    - "Weg_11"
+  
+  # Temperature sensor channels
+  temperature_channels:
+    - "Temp_Umgebung"
+    - "Temp_Unterseite"
+
+# Time series data augmentation parameters
+augmentation:
+  enable: true
+  add_noise: true
+  noise_std: 0.02
+  time_warp: true
+  warp_factor_range: [0.85, 1.15]
+
+# Cross validation parameters
+cross_validation:
+  n_splits: 5
+  shuffle: true
+  random_state: 42
+
+# Sensor configuration
+sensors:
+  # Sensor ID to position mapping (unit: mm)
+  sensor_positions:
+    1: 75
+    2: 110
+    3: 145
+    4: 180
+    5: 215
+    6: 250
+    7: 285
+    8: 320
+    9: 355
+    10: 390
+    11: 425
+  
+  # Sensor ID to channel mapping (force_channel, displacement_channel)
+  # Use null for displacement_channel if interpolation is required
+  channel_mapping:
+    1: [2, 3]
+    2: [4, 5]
+    3: [6, 7]
+    4: [8, 9]
+    5: [20, 21]
+    6: [22, 23]
+    7: [24, 25]
+    8: [26, 27]
+    9: [11, 12]
+    10: [13, null]  # Displacement needs interpolation
+    11: [15, 16]
+  
+  # Sensor 10 interpolation configuration
+  sensor_10_interpolation:
+    required_sensors: [9, 11]  # Sensor IDs required for interpolation
+    interpolation_positions:
+      9: 355
+      10: 390
+      11: 425
+  
+  # Reference sensor for cycle detection
+  reference_sensor: 6
+
+# Physics model parameters
+physics_model:
+  specimen_length: 400  # mm (length of asphalt specimen)
+  specimen_width: 100   # mm
+  specimen_height: 55   # mm
+  poisson_ratio: 0.35
+  sample_frequency: 4800.0  # Hz (sampling frequency)
+  nth_valley: 300  # Valley point index for computation (used as max value)
+  nth_valley_ratio: 0.1  # Adaptive ratio for computing nth_valley based on cycle length
+  min_nth_valley: 50  # Minimum nth_valley value
+  max_nth_valley: 300  # Maximum nth_valley value
+  time_threshold: 100  # Time threshold for cycle detection (seconds)
+  fourth_derivative_threshold: 1e-12  # Threshold for fourth derivative check
+  use_alternative_calculation: true  # Whether to use alternative calculation when fourth derivative is too small
+  gaussian_fit:
+    max_retry_attempts: 10  # Maximum number of retry attempts with different initial guesses
+    min_r_squared: 0.25  # Minimum R-squared threshold for acceptable fit quality
+    min_r_squared_disp: 0.20  # Minimum R-squared threshold for displacement fitting
+    min_r_squared_force: 0.25  # Minimum R-squared threshold for force fitting
+    alternative_initial_guesses: true  # Whether to try multiple initial guesses if first attempt fails
+    use_fallback_strategy: false  # Disable lenient fallback; rely on stable fits
+    fallback_r_squared_threshold: 0.0  # Unused when fallback disabled
+    use_bounds: true  # Use parameter bounds constraints in curve fitting
+    use_robust_fitting: true  # Use more robust fitting methods
+    min_r_squared_accept_for_label: 0.48  # Exclude cycles with disp/force R² below this from labels; null = no filter
+    min_points_for_r2_reject: 10  # Only apply R² rejection when n_positions >= this; skip rejection when n < 10
+    parameter_bounds:
+      a_min_factor: 0.1  # a minimum = data_range * factor
+      a_max_factor: 10.0  # a maximum = data_range * factor
+      b_min: 0  # Center position minimum (mm)
+      b_max: 500  # Center position maximum (mm)
+      c_min: 5  # Width minimum (mm)
+      c_max: 1000  # Width maximum (mm)
+  preprocess:
+    smoothing_window: 25  # Window for uniform smoothing before fitting
+    center: true  # Remove median to stabilize fitting
+    scale: true  # Robust scale to unit range using IQR
+    max_abs_scale: 1e6  # Clip after scaling to avoid overflow

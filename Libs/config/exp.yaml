@@ -1,0 +1,234 @@
+device:
+  gpu:
+    allow_growth: true
+    device_id: 0
+    enabled: true
+    memory_fraction: 0.8
+  type: auto
+evaluation:
+  regression_metrics:
+  - mse
+  - mae
+  - rmse
+  - r2
+  - relative_error
+  thresholds:
+    r2_min: 0.7
+    relative_error: 0.1
+experiment:
+  author: 匿名
+  date: '2025-10-11'
+  description: 基于深度学习的沥青疲劳寿命时序预测系统
+  name: 沥青疲劳寿命预测实验
+  version: 1.5.2
+experiment_control:
+  memory:
+    allow_growth: true
+    memory_fraction: 0.8
+    pin_memory: true
+  mode: complete
+  parallel:
+    enable: false
+    n_jobs: -1
+  random_seed: 42
+logging:
+  console_handlers: true
+  file_handlers: true
+  format: '%(asctime)s - %(levelname)s - %(message)s'
+  level: INFO
+  log_file: Output/logs/experiment.log
+  progress_bar:
+    desc: Processing
+    enable: true
+    leave: true
+    position: 0
+mode: complete
+models:
+  gru:
+    batch_first: true
+    bidirectional: false
+    dropout_rate: 0.3
+    enable: true
+    hidden_dim: 256
+    input_dim: null
+    num_layers: 3
+  lstm:
+    batch_first: true
+    bidirectional: false
+    dropout_rate: 0.3
+    enable: true
+    hidden_dim: 256
+    input_dim: null
+    num_layers: 3
+  rnn:
+    batch_first: true
+    bidirectional: false
+    dropout_rate: 0.3
+    enable: false
+    hidden_dim: 256
+    input_dim: null
+    num_layers: 3
+  transformer:
+    activation: relu
+    custom_decoder: false
+    custom_encoder: false
+    d_model: 128
+    dim_feedforward: 512
+    dropout: 0.1
+    enable: false
+    input_dim: null
+    nhead: 8
+    num_decoder_layers: 3
+    num_encoder_layers: 3
+paths:
+  all_models: Output/models/all_models.pkl
+  best_model: Output/models/best_model.pkl
+  cross_validation_results: Output/results/cross_validation_results.json
+  data_distribution: Output/figures/data_distribution.png
+  experiment_results: Output/results/experiment_results.json
+  feature_correlation: Output/figures/feature_correlation.png
+  feature_importance: Output/models/feature_importance.json
+  feature_target_correlation: Output/figures/feature_target_correlation.png
+  figures_dir: Output/figures
+  logs_dir: Output/logs
+  model_metrics: Output/models/model_metrics.json
+  model_performance: Output/figures/model_performance.png
+  models_dir: Output/models
+  output_dir: Output
+  prediction_results: Output/results/prediction_results.json
+  predictions_vs_actual: Output/figures/predictions_vs_actual.png
+  processed_data_dir: Input/processed
+  processed_features: Input/processed/processed_features.csv
+  processed_labels: Input/processed/processed_labels.csv
+  processed_metadata: Input/processed/processed_metadata.json
+  raw_data: Input/raw/data.mat
+  residuals_plot: Output/figures/residuals_plot.png
+  results_dir: Output/results
+pipeline:
+  run_cross_validation: true
+  run_dataset_construction: true
+  run_feature_analysis: true
+  run_modeling: true
+  run_preprocessing: true
+  run_visualization: true
+prediction:
+  new_data_path: null
+preprocessing:
+  cleaning:
+    fill_missing: true
+    iqr_factor: 1.5
+    missing_method: interpolate
+    outlier_method: iqr
+    remove_duplicates: true
+    remove_outliers: true
+    zscore_threshold: 3.0
+  data_split:
+    random_state: 42
+    stratify: false
+    test_size: 0.2
+    val_size: 0.2
+  label_normalization:
+    enable: true
+    log_transform: false
+    method: standard
+  normalization:
+    feature_range:
+    - 0
+    - 1
+    method: per_channel_minmax
+  time_series:
+    data_augmentation:
+      augmentation_factor: 1.0
+      enable: false
+      noise_level: 0.01
+    max_sequence_length: 20000
+    sequence_length: 1000
+    sliding_window: true
+    stride: 500
+random_state: 42
+training:
+  batch_size: 1
+  checkpointing:
+    mode: min
+    monitor: val_loss
+    save_best_model: true
+    save_frequency: 10
+    save_last_model: true
+  contrastive_learning:
+    augmentation:
+      enable_masking: true
+      enable_noise: true
+      enable_time_warp: true
+      mask_ratio: 0.15
+      noise_std: 0.01
+      time_warp_factor: 0.1
+    enable: false
+    pretrain_batch_size: 8
+    pretrain_epochs: 20
+    pretrain_lr: 0.001
+    projection_dim: 64
+    temperature: 0.07
+  early_stopping:
+    enable: true
+    min_delta: 1.0e-05
+    monitor: val_loss
+    patience: 20
+    restore_best_weights: true
+  gradient_clipping:
+    enable: true
+    max_norm: 1.0
+  learning_rate: 0.001
+  loss_function:
+    huber_delta: 1.0
+    sample_weighting:
+      enable: true
+      positive_weight: 3.0
+      zero_weight: 1.0
+    type: mse
+  num_epochs: 1
+  num_workers: 0
+  optimizer:
+    adam:
+      betas:
+      - 0.9
+      - 0.999
+      eps: 1e-8
+    rmsprop:
+      alpha: 0.99
+      eps: 1e-8
+    sgd:
+      momentum: 0.9
+      nesterov: false
+    type: adam
+  scheduler:
+    cosine:
+      T_max: 100
+      eta_min: 0.0001
+    exponential:
+      gamma: 0.95
+    reduce_on_plateau:
+      cooldown: 0
+      factor: 0.5
+      mode: min
+      patience: 10
+      threshold: 0.0001
+    step:
+      gamma: 0.1
+      step_size: 30
+    type: reduce_on_plateau
+  warmup_epochs: 5
+  weight_decay: 0.0001
+visualization:
+  figure:
+    dpi: 300
+    format: png
+    style: seaborn-v0_8
+  model_analysis:
+    activation_maps: false
+    attention_weights: true
+    feature_importance: false
+  training_plots:
+    learning_rate_curve: true
+    loss_curves: true
+    prediction_scatter: true
+    residual_plot: true

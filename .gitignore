@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+*.so
+
+# Virtual env (optional)
+venv/
+.venv/
+env/
+
+# Data and outputs
+*.pkl
+*.npz
+*.mat
+*.log
+*.pth
+Output/
+Input/processed/
+Input/graph_processed/
+
+# Config backups
+*.backup
+
+# IDE / editor
+.cursor/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
